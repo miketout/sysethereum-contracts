@@ -41,11 +41,11 @@ contract SyscoinDepositsManager {
     // @param amount – how much eth to withdraw
     // @return – sender's updated deposit amount.
     function withdrawDeposit(uint amount) external returns (uint) {
-        require(deposits[msg.sender] >= amount);
+        require(deposits[msg.sender] >= amount && amount > 0);
 
         deposits[msg.sender] = deposits[msg.sender].sub(amount);
-        msg.sender.transfer(amount);
-
+        // stop using .transfer() because of gas issue after ethereum upgrade
+        msg.sender.call.value(amount)("");
         emit DepositWithdrawn(msg.sender, amount);
         return deposits[msg.sender];
     }
